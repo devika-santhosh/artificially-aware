@@ -5,7 +5,7 @@ import textwrap
 import time
 
 # Define parameters
-text = "Hi, welcome back to Artificially Aware orginal production"  
+text = "Rise, Shine, Conquer."  
 font = cv2.FONT_HERSHEY_SIMPLEX
 font_scale = 1
 thickness = 2

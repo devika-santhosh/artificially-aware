@@ -12,12 +12,20 @@ images = sorted([os.path.join(image_folder, img) for img in os.listdir(image_fol
 # Parameters
 fps = 24  # Frames per second
 duration_per_image = 3  # Duration for each image
-transition_duration = 0.5  # Smooth fade transition duration
+transition_duration = 1.0  # Smooth fade transition duration
 resolution = (1920, 1080)  # Full HD 16:9 resolution
+
+# Load audio to determine final video duration
+audio = AudioFileClip(audio_file)
+final_video_duration = audio.duration
+
+# Calculate how many times to repeat images
+total_images_needed = int(final_video_duration / duration_per_image) + 1
+repeated_images = (images * (total_images_needed // len(images) + 1))[:total_images_needed]  # Repeat images as needed
 
 # Create individual clips with proper resizing, cropping, and zoom-in effect
 clips = []
-for img in images:
+for img in repeated_images:
     clip = ImageClip(img)
 
     # Get aspect ratio of the image
@@ -44,14 +52,8 @@ for img in images:
 # Concatenate clips with smooth transitions
 final_clip = concatenate_videoclips(clips, method="compose")
 
-# Load and adjust audio
-audio = AudioFileClip(audio_file)
-
-# Match audio and video duration
-if final_clip.duration > audio.duration:
-    final_clip = final_clip.subclip(0, audio.duration)
-else:
-    audio = audio.subclip(0, final_clip.duration)
+# Trim or extend video to match audio duration
+final_clip = final_clip.set_duration(final_video_duration)
 
 # Add audio to the video
 final_clip = final_clip.set_audio(audio)
